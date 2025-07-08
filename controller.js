@@ -2,6 +2,7 @@ import { Data } from './models.js'
 
 import { create, check } from './captcha.js';
 
+import { ssn_validator } from './helper.js';
 export const create_captcha = async (req, res) => {
 	try {
 		res.json(await create(req.query.id));
@@ -12,8 +13,8 @@ export const create_captcha = async (req, res) => {
 
 export const check_captcha = async (req, res, next) => {
 	try {
-		const { id, text } = req.body;
-		await check(text, id);
+		const { captcha, id } = req.body;
+		await check(captcha, id);
 		next();
 	} catch (error) {
 		console.log(error)
@@ -39,10 +40,32 @@ export const add_data = async (req, res) => {
 			robbery
 		} = req.body;
 
-		// بررسی اولیه مقادیر ضروری
+		// اعتبارسنجی فیلدهای ضروری
 		if (!nationalCode || !name || !familyname || !address || !postalCode || !phoneNumber)
-			return res.status(400).json({ error: 'Missing required fields' });
+			return res.status(400).json('لطفا همه فیلدهای ضروری را وارد کنید.');
 
+		// اعتبارسنجی کد ملی
+		if (!ssn_validator(nationalCode))
+			return res.status(400).json('کد ملی وارد شده معتبر نیست.');
+
+		// اعتبارسنجی نام و نام خانوادگی
+		if (typeof name !== 'string' || name.length < 2)
+			return res.status(400).json('نام باید حداقل ۲ حرف باشد.');
+
+		if (typeof familyname !== 'string' || familyname.length < 2)
+			return res.status(400).json('نام خانوادگی باید حداقل ۲ حرف باشد.');
+
+		// اعتبارسنجی شماره تلفن
+		if (!/^\d{11}$/.test(phoneNumber))
+			return res.status(400).json('شماره تلفن باید ۱۱ رقم باشد.');
+
+		// اعتبارسنجی کد پستی
+		if (!/^\d{10}$/.test(postalCode))
+			return res.status(400).json('کد پستی باید ۱۰ رقم باشد.');
+
+		// اعتبارسنجی متراژ (اختیاری)
+		if (houseArea && (isNaN(houseArea) || houseArea <= 0))
+			return res.status(400).json('متراژ باید یک عدد مثبت باشد.');
 
 		const data = {
 			national_code: nationalCode,
@@ -62,9 +85,9 @@ export const add_data = async (req, res) => {
 
 		const result = await Data.create(data);
 
-		res.status(200).json({ message: 'Data inserted successfully', result });
+		res.status(200).json('اطلاعات با موفقیت ثبت شد.' );
 	} catch (error) {
 		console.error('Database insert error:', error);
-		res.status(500).json({ error: 'An unexpected error occurred.' });
+		res.status(500).json({ error: 'خطای غیرمنتظره رخ داد.' });
 	}
 }

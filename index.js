@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(express.static('public'));
 // Route
 app.get("/captcha", create_captcha);
 app.post("/kharazmiforms", check_captcha, add_data);
