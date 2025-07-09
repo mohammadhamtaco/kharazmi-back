@@ -23,3 +23,25 @@ export const test_date = (date) => {
 		throw new Error('تاریخ صحیح نیست');
 	return true
 };
+
+export const convert_persian_to_english_numbers = (text) => {
+	if (!text || typeof text !== 'string') return text;
+	
+	const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+	const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+	const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+	
+	let result = text;
+	
+	// تبدیل اعداد فارسی
+	persianNumbers.forEach((num, index) => {
+		result = result.replace(new RegExp(num, 'g'), englishNumbers[index]);
+	});
+	
+	// تبدیل اعداد عربی
+	arabicNumbers.forEach((num, index) => {
+		result = result.replace(new RegExp(num, 'g'), englishNumbers[index]);
+	});
+	
+	return result;
+};

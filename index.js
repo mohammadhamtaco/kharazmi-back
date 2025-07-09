@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { config } from "dotenv";
+import { config } from 'dotenv';
 config();
-const { port } = process.env;
 import { create_captcha, check_captcha, add_data } from "./controller.js";
+
+const { port } = process.env;
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));

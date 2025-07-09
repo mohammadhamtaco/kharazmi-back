@@ -2,7 +2,7 @@ import { Data } from './models.js'
 
 import { create, check } from './captcha.js';
 
-import { ssn_validator } from './helper.js';
+import { ssn_validator, convert_persian_to_english_numbers } from './helper.js';
 export const create_captcha = async (req, res) => {
 	try {
 		res.json(await create(req.query.id));
@@ -71,7 +71,7 @@ export const add_data = async (req, res) => {
 			national_code: nationalCode,
 			name,
 			family_name: familyname,
-			address,
+			address: convert_persian_to_english_numbers(address),
 			postal_code: postalCode,
 			phone_number: phoneNumber,
 			house_area: houseArea || null,
